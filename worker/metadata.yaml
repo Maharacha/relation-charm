@@ -11,10 +11,6 @@ tags:
 series:
     - bionic
     - xenial
-# -- example relations, delete if unneeded
-#requires:
-#    db:
-#        interface: mysql
-#provides:
-#    website:
-#        interface: http
+requires:
+    master:
+        interface: exchange

@@ -12,7 +12,7 @@ from ops.charm import CharmBase
 from ops.framework import StoredState
 from ops.main import main
 from ops.model import ActiveStatus, MaintenanceStatus
-
+from hookenv import relation_ids, relation_set
 
 class MasterCharm(CharmBase):
     """Class reprisenting this Operator charm."""
@@ -30,6 +30,10 @@ class MasterCharm(CharmBase):
         self.state.set_default(installed=False)
         self.state.set_default(configured=False)
         self.state.set_default(started=False)
+        # -- actions
+        self.framework.observe(self.on.broadcast_message_action, self.on_broadcast_message_action)
+        # -- relations
+        self.framework.observe(self.on.master_application_relation_changed, self.on_master_application_relation_changed)
 
     def on_install(self, event):
         """Handle install state."""
@@ -86,17 +90,25 @@ class MasterCharm(CharmBase):
             event.defer()
 
     # -- Example relation interface for MySQL, not observed by default:
-    def on_db_relation_changed(self, event):
+    def on_master_application_relation_changed(self, event):
         """Handle an example db relation's change event."""
-        self.password = event.relation.data[event.unit].get("password")
-        self.unit.status = MaintenanceStatus("Configuring database")
-        if self.mysql.is_ready:
-            event.log("Database relation complete")
-        self.state._db_configured = True
+        logging.info("master event data: {}".format(event))
 
-    def on_example_action(self, event):
+    def on_broadcast_message_action(self, event):
         """Handle the example_action action."""
-        event.log("Hello from the example action.")
+        event.log("Sending message: {}".format(event.params.get('message')))
+        logging.info("Sending message: {}".format(event.params.get('message')))
+        # Get the message from the juju function/action
+        message = event.params.get('message')
+
+        # Assume that the first relation_id is the only and use that.
+        relation_id = relation_ids('master-application')[0]
+
+        relation_data = { 'message': message }
+
+        # ... set the relational data.
+        relation_set(relation_id, relation_settings=relation_data)
+
         event.set_results({"success": "true"})
 
 

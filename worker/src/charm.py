@@ -30,6 +30,8 @@ class WorkerCharm(CharmBase):
         self.state.set_default(installed=False)
         self.state.set_default(configured=False)
         self.state.set_default(started=False)
+        # -- relations
+        self.framework.observe(self.on.master_relation_changed, self.on_master_relation_changed)
 
     def on_install(self, event):
         """Handle install state."""
@@ -86,18 +88,15 @@ class WorkerCharm(CharmBase):
             event.defer()
 
     # -- Example relation interface for MySQL, not observed by default:
-    def on_db_relation_changed(self, event):
-        """Handle an example db relation's change event."""
-        self.password = event.relation.data[event.unit].get("password")
-        self.unit.status = MaintenanceStatus("Configuring database")
-        if self.mysql.is_ready:
-            event.log("Database relation complete")
-        self.state._db_configured = True
-
-    def on_example_action(self, event):
-        """Handle the example_action action."""
-        event.log("Hello from the example action.")
-        event.set_results({"success": "true"})
+    def on_master_relation_changed(self, event):
+        logging.info("worker event: {}".format(event))
+        logging.info("worker event data: {}".format(event.relation.data))
+        # msg = event.relation.data[event.unit].get('message', None)
+        # logging.info(msg)
+        # if self.model.is_leader():
+        #     logging.info("IM LEADER")
+        # else:
+        #     logging.info("NOT LEADER :(")
 
 
 if __name__ == "__main__":
