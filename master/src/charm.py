@@ -12,7 +12,7 @@ from ops.charm import CharmBase
 from ops.framework import StoredState
 from ops.main import main
 from ops.model import ActiveStatus, MaintenanceStatus
-from hookenv import relation_ids, relation_set
+
 
 class MasterCharm(CharmBase):
     """Class reprisenting this Operator charm."""
@@ -96,19 +96,12 @@ class MasterCharm(CharmBase):
 
     def on_broadcast_message_action(self, event):
         """Handle the example_action action."""
-        event.log("Sending message: {}".format(event.params.get('message')))
-        logging.info("Sending message: {}".format(event.params.get('message')))
-        # Get the message from the juju function/action
-        message = event.params.get('message')
-
-        # Assume that the first relation_id is the only and use that.
-        relation_id = relation_ids('master-application')[0]
-
-        relation_data = { 'message': message }
-
-        # ... set the relational data.
-        relation_set(relation_id, relation_settings=relation_data)
-
+        if self.model.relations.__len__():
+            logging.info("I have a relation!!!")
+            for rel_name in self.model.relations.__iter__():
+                rel_list = self.model.relations.__getitem__(rel_name)
+                rel_obj = rel_list[0]
+                rel_obj.data[self.unit]['message'] = event.params.get('message')
         event.set_results({"success": "true"})
 
 

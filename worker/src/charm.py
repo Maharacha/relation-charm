@@ -89,14 +89,11 @@ class WorkerCharm(CharmBase):
 
     # -- Example relation interface for MySQL, not observed by default:
     def on_master_relation_changed(self, event):
-        logging.info("worker event: {}".format(event))
-        logging.info("worker event data: {}".format(event.relation.data))
-        # msg = event.relation.data[event.unit].get('message', None)
-        # logging.info(msg)
-        # if self.model.is_leader():
-        #     logging.info("IM LEADER")
-        # else:
-        #     logging.info("NOT LEADER :(")
+        logging.info("Message: {}".format(event.relation.data[event.unit].get('message')))
+        if self.unit.is_leader():
+            logging.info("IM LEADER")
+        else:
+            logging.info("NOT LEADER :(")
 
 
 if __name__ == "__main__":
