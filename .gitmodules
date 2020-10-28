@@ -1,0 +1,6 @@
+[submodule "master/mod/operator"]
+	path = master/mod/operator
+	url = https://github.com/canonical/operator.git
+[submodule "worker/mod/operator"]
+	path = worker/mod/operator
+	url = https://github.com/canonical/operator.git
