@@ -96,10 +96,10 @@ class MasterCharm(CharmBase):
 
     def on_broadcast_message_action(self, event):
         """Handle the example_action action."""
-        if self.model.relations.__len__():
+        if self.model.relations:
             logging.info("I have a relation!!!")
-            for rel_name in self.model.relations.__iter__():
-                rel_list = self.model.relations.__getitem__(rel_name)
+            for rel_name in self.model.relations:
+                rel_list = self.model.relations.get(rel_name)
                 rel_obj = rel_list[0]
                 rel_obj.data[self.unit]['message'] = event.params.get('message')
         event.set_results({"success": "true"})
